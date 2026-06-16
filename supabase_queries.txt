@@ -1,0 +1,114 @@
+// profiles table:
+create table profiles (
+  id uuid primary key references auth.users(id) on delete cascade,
+  handle text unique not null,
+  created_at timestamptz default now()
+);
+
+// bookmarks table:
+create table bookmarks (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null references profiles(id) on delete cascade,
+  title text not null,
+  url text not null,
+  is_public boolean not null default false,
+  created_at timestamptz default now()
+);
+
+User
+ │
+ ▼
+Profile
+ │
+ ▼
+Bookmarks
+
+--------Enable RLS on profiles-----------
+
+alter table profiles enable row level security;
+
+alter table bookmarks enable row level security;
+
+-----Profiles Policies-----------------
+
+create policy "Users can insert own profile"
+on profiles
+for insert
+to authenticated
+with check (
+  auth.uid() = id
+);
+
+create policy "Users can read own profile"
+on profiles
+for select
+to authenticated
+using (
+  auth.uid() = id
+);
+
+create policy "Users can update own profile"
+on profiles
+for update
+to authenticated
+using (
+  auth.uid() = id
+);
+
+-----Public Handle Lookup-----
+
+create policy "Public can read profiles"
+on profiles
+for select
+to anon
+using (true);
+
+
+----------Bookmarks Policies----------
+
+create policy "Users read own bookmarks"
+on bookmarks
+for select
+to authenticated
+using (
+  auth.uid() = user_id
+);
+
+create policy "Users create own bookmarks"
+on bookmarks
+for insert
+to authenticated
+with check (
+  auth.uid() = user_id
+);
+
+create policy "Users update own bookmarks"
+on bookmarks
+for update
+to authenticated
+using (
+  auth.uid() = user_id
+);
+
+create policy "Users delete own bookmarks"
+on bookmarks
+for delete
+to authenticated
+using (
+  auth.uid() = user_id
+);
+
+----------Public Bookmarks Policy----------
+
+create policy "Public can read public bookmarks"
+on bookmarks
+for select
+to anon
+using (
+  is_public = true
+);
+
+
+
+
+
