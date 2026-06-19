@@ -2,6 +2,14 @@
 
 import { useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
+import { useEffect } from 'react'
+
+type Bookmark = {
+  id: string
+  title: string
+  url: string
+  is_public: boolean
+}
 
 export default function BookmarksSection() {
   const supabase = createClient()
@@ -10,7 +18,25 @@ export default function BookmarksSection() {
   const [url, setUrl] = useState('')
   const [isPublic, setIsPublic] = useState(false)
   const [message, setMessage] = useState('')
+  const [bookmarks, setBookmarks] = useState<Bookmark[]>([])
 
+  // Fetch bookmarks from database
+  async function fetchBookmarks() {
+    const { data, error } = await supabase
+      .from('bookmarks')
+      .select('*')
+      .order('created_at', { ascending: false })
+
+    if (!error && data) {
+      setBookmarks(data)
+    }
+  }
+
+  useEffect(() => {
+    fetchBookmarks()
+  }, [])
+
+  // Handle form submission
   async function handleSubmit(
     e: React.FormEvent<HTMLFormElement>
   ) {
@@ -43,15 +69,17 @@ export default function BookmarksSection() {
     setUrl('')
     setIsPublic(false)
 
-    setMessage('Bookmark created.')
+    // setMessage('Bookmark created.')
+    await fetchBookmarks()
   }
 
+  // Render bookmarks
   return (
     <div className="mt-8">
       <h2 className="text-xl font-semibold mb-4">
         My Bookmarks
       </h2>
-
+      {/* Form to add new bookmark */}
       <form
         onSubmit={handleSubmit}
         className="flex flex-col gap-3 max-w-md"
@@ -92,6 +120,32 @@ export default function BookmarksSection() {
           Add Bookmark
         </button>
       </form>
+
+      {/* Display existing bookmarks */}
+      <div className="mt-8">
+        {bookmarks.length === 0 ? (
+          <p>No bookmarks yet.</p>
+        ) : (
+          bookmarks.map((bookmark) => (
+            <div
+              key={bookmark.id}
+              className="border p-3 mb-3"
+            >
+              <h3 className="font-semibold">
+                {bookmark.title}
+              </h3>
+
+              <p>{bookmark.url}</p>
+
+              <p>
+                {bookmark.is_public
+                  ? 'Public'
+                  : 'Private'}
+              </p>
+            </div>
+          ))
+        )}
+      </div>
 
       {message && (
         <p className="mt-4">{message}</p>
