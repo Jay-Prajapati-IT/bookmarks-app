@@ -27,6 +27,30 @@ export default function LoginPage() {
       return
     }
 
+    const {
+      data: { user },
+    } = await supabase.auth.getUser()
+
+    if (user) {
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('id')
+        .eq('id', user.id)
+        .single()
+
+      if (!profile) {
+        const randomHandle =
+          'user_' + user.id.slice(0, 8)
+
+        await supabase
+          .from('profiles')
+          .insert({
+            id: user.id,
+            handle: randomHandle,
+          })
+      }
+    }
+
     router.push('/dashboard')
   }
 
