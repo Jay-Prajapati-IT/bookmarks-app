@@ -19,6 +19,11 @@ export default function BookmarksSection() {
   const [isPublic, setIsPublic] = useState(false)
   const [message, setMessage] = useState('')
   const [bookmarks, setBookmarks] = useState<Bookmark[]>([])
+  //edit functionality
+  const [editingId, setEditingId] = useState<string | null>(null)
+  const [editTitle, setEditTitle] = useState('')
+  const [editUrl, setEditUrl] = useState('')
+  const [editPublic, setEditPublic] = useState(false)
 
   // Fetch bookmarks from database
   async function fetchBookmarks() {
@@ -72,6 +77,42 @@ export default function BookmarksSection() {
     // setMessage('Bookmark created.')
     await fetchBookmarks()
   }
+  // Delete a bookmark function
+  async function handleDelete(id: string) {
+    const { error } = await supabase
+      .from('bookmarks')
+      .delete()
+      .eq('id', id)
+
+    if (error) {
+      console.error(error)
+      return
+    }
+
+    await fetchBookmarks()
+  }
+  // Update a bookmark function
+  async function handleUpdate() {
+    if (!editingId) return
+
+    const { error } = await supabase
+      .from('bookmarks')
+      .update({
+        title: editTitle,
+        url: editUrl,
+        is_public: editPublic,
+      })
+      .eq('id', editingId)
+
+    if (error) {
+      console.error(error)
+      return
+    }
+
+    setEditingId(null)
+
+    await fetchBookmarks()
+  }
 
   // Render bookmarks
   return (
@@ -120,7 +161,7 @@ export default function BookmarksSection() {
           Add Bookmark
         </button>
       </form>
-
+      
       {/* Display existing bookmarks */}
       <div className="mt-8">
         {bookmarks.length === 0 ? (
@@ -131,17 +172,89 @@ export default function BookmarksSection() {
               key={bookmark.id}
               className="border p-3 mb-3"
             >
-              <h3 className="font-semibold">
-                {bookmark.title}
-              </h3>
+              {editingId === bookmark.id ? (
+                <div className="flex flex-col gap-2">
+                  <input
+                    type="text"
+                    value={editTitle}
+                    onChange={(e) =>
+                      setEditTitle(e.target.value)
+                    }
+                    className="border p-2"
+                  />
 
-              <p>{bookmark.url}</p>
+                  <input
+                    type="url"
+                    value={editUrl}
+                    onChange={(e) =>
+                      setEditUrl(e.target.value)
+                    }
+                    className="border p-2"
+                  />
 
-              <p>
-                {bookmark.is_public
-                  ? 'Public'
-                  : 'Private'}
-              </p>
+                  <label className="flex gap-2">
+                    <input
+                      type="checkbox"
+                      checked={editPublic}
+                      onChange={(e) =>
+                        setEditPublic(e.target.checked)
+                      }
+                    />
+                    Public
+                  </label>
+
+                  <div className="flex gap-2">
+                    <button
+                      onClick={handleUpdate}
+                      className="border px-2 py-1"
+                    >
+                      Save
+                    </button>
+
+                    <button
+                      onClick={() => setEditingId(null)}
+                      className="border px-2 py-1"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <>
+                  <h3 className="font-semibold">
+                    {bookmark.title}
+                  </h3>
+
+                  <p>{bookmark.url}</p>
+
+                  <p>
+                    {bookmark.is_public
+                      ? 'Public'
+                      : 'Private'}
+                  </p>
+
+                  <button
+                    onClick={() => {
+                      setEditingId(bookmark.id)
+                      setEditTitle(bookmark.title)
+                      setEditUrl(bookmark.url)
+                      setEditPublic(bookmark.is_public)
+                    }}
+                    className="border px-2 py-1 mr-2"
+                  >
+                    Edit
+                  </button>
+
+                  <button
+                    onClick={() =>
+                      handleDelete(bookmark.id)
+                    }
+                    className="border px-2 py-1"
+                  >
+                    Delete
+                  </button>
+                </>
+              )}
             </div>
           ))
         )}
