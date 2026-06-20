@@ -1,36 +1,111 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Bookmarks App
 
-## Getting Started
+A simple personal bookmarks application built with Next.js and Supabase.
 
-First, run the development server:
+Users can create an account, manage their bookmarks, control bookmark visibility (public/private), and share public bookmarks through a unique profile handle.
+
+## Features
+
+### Authentication
+
+* Email and password signup
+* Email confirmation via Supabase Auth
+* Login and logout functionality
+* Protected dashboard for authenticated users
+
+### Bookmark Management
+
+* Create bookmarks
+* View bookmarks
+* Update bookmarks
+* Delete bookmarks
+* Mark bookmarks as public or private
+
+### Profile System
+
+* Unique user handles
+* Public profile pages (`/<handle>`)
+* Public profiles display only public bookmarks
+
+### Security
+
+* Row Level Security (RLS) enabled in Supabase
+* Users can only access and modify their own data
+* Public visitors can only view public bookmarks
+
+## Tech Stack
+
+* Next.js (App Router)
+* React
+* TypeScript
+* Tailwind CSS
+* Supabase
+
+  * Authentication
+  * PostgreSQL Database
+  * Row Level Security (RLS)
+
+## Environment Variables
+
+Create a `.env.local` file in the project root and add:
+
+```env
+NEXT_PUBLIC_SUPABASE_URL=your_supabase_project_url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+```
+
+> The `.env.local` file is intentionally excluded from Git and is not included in this repository.
+
+## Installation
+
+Clone the repository:
+
+```bash
+git clone <repository-url>
+cd bookmarks-app
+```
+
+Install dependencies:
+
+```bash
+npm install
+```
+
+Create a `.env.local` file and add the required environment variables.
+
+Start the development server:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```txt
+http://localhost:3000
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Database
 
-## Learn More
+The application uses Supabase PostgreSQL with Row Level Security policies to enforce data ownership and privacy.
 
-To learn more about Next.js, take a look at the following resources:
+Main tables:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+* profiles
+* bookmarks
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Deployment
 
-## Deploy on Vercel
+The application is deployed on Vercel.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Notes
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+This project was built with a focus on functionality, security, and clean architecture rather than advanced UI design.
+
+Key areas of focus:
+
+* Authentication
+* Authorization
+* Data privacy
+* Secure public sharing
+* Supabase Row Level Security
