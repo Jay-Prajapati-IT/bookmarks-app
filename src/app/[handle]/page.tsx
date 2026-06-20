@@ -1,5 +1,4 @@
 import { createClient } from "@/lib/supabase/server"
-import { error } from "console"
 import { notFound } from 'next/navigation'
 
 export default async function PublicProfilePage({
@@ -16,12 +15,8 @@ export default async function PublicProfilePage({
         .eq('handle', handle)
         .single()
 
-    console.log('HANDLE:', handle)
-    console.log('PROFILE:', profile)
-    console.log('ERROR:', error)
-
     if (!profile) {
-        return <div>Profile not found</div>
+        return notFound()
     }
 
     const { data: bookmarks } = await supabase

@@ -17,16 +17,32 @@ export default async function DashboardPage() {
   }
 
   return (
-    <div className="p-8">
-      <h1 className="text-2xl font-bold">
-        Dashboard
-      </h1>
+    <div className="min-h-screen p-6">
+      <div className="max-w-4xl mx-auto">
+        <div className="border rounded-lg p-6 mb-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-3xl font-bold">
+                Dashboard
+              </h1>
 
-      <p>Welcome {user.email}</p>
+              <p className="text-sm text-gray-600 mt-1">
+                Welcome, {user.email}
+              </p>
+            </div>
 
-      <LogoutButton />
-      <ProfileSection />
-      <BookmarksSection />
+            <LogoutButton />
+          </div>
+        </div>
+
+        <div className="border rounded-lg p-6 mb-6">
+          <ProfileSection />
+        </div>
+
+        <div className="border rounded-lg p-6">
+          <BookmarksSection />
+        </div>
+      </div>
     </div>
   )
 }
