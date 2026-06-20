@@ -60,7 +60,6 @@ using (
 create policy "Public can read profiles"
 on profiles
 for select
-to anon
 using (true);
 
 
